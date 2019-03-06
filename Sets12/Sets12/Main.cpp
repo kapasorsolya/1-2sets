@@ -15,7 +15,7 @@ bool firstSolution = false;
 
 int main(int argc,char*argv[])
 {
-	int n = 9; // n- domenium milyen 
+	int n = 10; // n- domenium milyen 
 	int p = 6; // p elembol all
 	int*a = (int*)malloc(n * sizeof(int));
 	if (a == NULL)
@@ -34,14 +34,13 @@ int main(int argc,char*argv[])
 	return 0;
 }
 
-
 void BT(int*x, int n, int k, int p)
 {
 	for (x[k] = 1;x[k] <= n;x[k]++)
 	{
 		if (firstSolution == false)
 		{
-			if (isPromising(x, n, k))
+			if (isPromising(x, p, k))
 			{
 				counter++;
 				if (isSolution(x, k, p))
@@ -55,7 +54,6 @@ void BT(int*x, int n, int k, int p)
 				}
 			}
 		}
-		
 	}
 }
 
@@ -76,9 +74,9 @@ int isSolution(int*x, int k, int p)
 
 int isPromising(int*x, int p, int k)
 {
-	if (k==5)
+	if (k==p-1)
 	{
-		if (x[k] != x[k - 1] * 2) {
+		if (x[k] != x[k - 1] / 2) {
 			return false;
 		}
 	}
