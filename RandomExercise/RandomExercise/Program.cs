@@ -100,6 +100,8 @@ namespace RandomExercise
             //    Console.WriteLine();
             //}
 
+          
+
 
         }
 
@@ -227,6 +229,44 @@ namespace RandomExercise
                 }
             }
             return true;
+        }
+        public static void Ac3(List<Domenium> domeniumList,int[,]matrix)
+        {
+            Queue queue=new Queue();
+
+            while (queue.Count!=null)
+            {
+                //if (RemoveInconsistentValues(x0, x1, domeniumList))
+                //{
+                //    for (int i = 0; i < matrix.GetLength(0); i++)
+                //    {
+                //        queue = (matrix[x0, i], x0);
+                //    }
+                //}
+            }
+            
+        }
+        public static bool RemoveInconsistentValues(int x0, int x1, List<Domenium> domeniumList){
+            bool removed=false;
+            bool yes;
+            foreach(var i in domeniumList.ElementAt(x0).ElementsOfDomenium){
+                yes=false;
+                foreach(var j in domeniumList.ElementAt(x1).ElementsOfDomenium){
+                    if(i!=j){
+                    yes=true;
+                    break;
+                        }
+
+                }
+                 if(!yes)
+                {
+                 domeniumList.ElementAt(x0).ElementsOfDomenium.Remove(i);
+                    removed=true;
+                    
+                }
+
+            }                   
+            return removed;
         }
 
     }
