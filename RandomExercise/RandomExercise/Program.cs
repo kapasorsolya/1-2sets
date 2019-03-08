@@ -12,25 +12,38 @@ namespace RandomExercise
     {
         static int counter = 0;
         static bool firstSolution = false;
-
         static void Main(string[] args)
         {
             int n = 9;
             int p = 6;
             int[] a = new int[p];
 
-           //BT(a, n, 0, p);
-           
-            Console.WriteLine("Bactrack: Number of assigments " + counter);
+            //BT(a, n, 0, p);
 
             List<Domenium> domeniumList = new List<Domenium>();
+            List<Domenium> removedItemFromDomeniumList = new List<Domenium>();
+            List<int> usedVariablesNumbersList = new List<int>();
+            int[,] matrix = new int[p, p];
+
+            Console.WriteLine("Bactrack: Number of assigments " + counter);
+
+            InitializeDomeniums(n,p, domeniumList, removedItemFromDomeniumList);
+
+            BuildNeighbours(p,matrix);
+            BTWithMVR(a, n, 0, p,domeniumList,removedItemFromDomeniumList,matrix,usedVariablesNumbersList);
+            int value = MinimumRemainValues(domeniumList, usedVariablesNumbersList, p);
+            Console.WriteLine("BT + MVR + forward checking: Number of assigments= " + counter);
+            Console.WriteLine("Press Key....");
+            Console.ReadKey();
+            
+        }
+
+        private static void InitializeDomeniums(int n, int p, List<Domenium> domeniumList, List<Domenium> removedItemFromDomeniumList)
+        {
             List<int> itemsOfDomenium;
             itemsOfDomenium = Enumerable.Range(1, n).ToList();
-
-            List<Domenium> removedItemFromDomeniumList = new List<Domenium>();
-
             List<int> evenNumbers = itemsOfDomenium.Where(n1 => n1 % 2 == 0).ToList();
-         
+
             for (int i = 0; i < p; i++)
             {
                 removedItemFromDomeniumList.Add(new Domenium
@@ -40,7 +53,7 @@ namespace RandomExercise
 
                 if (i == p - 2)
                 {
-                   
+
                     domeniumList.Add(new Domenium
                     {
                         ElementsOfDomenium = evenNumbers
@@ -54,22 +67,7 @@ namespace RandomExercise
                         ElementsOfDomenium = itemsOfDomenium
                     });
                 }
-
-              
-               
             }
-
-            int[,] matrix = new int[p, p];
-
-            List<int> usedVariablesNumbersList = new List<int>();
-
-            BuildNeighbours(p,matrix);
-            MVR(a, n, 0, p,domeniumList,removedItemFromDomeniumList,matrix,usedVariablesNumbersList);
-            int value = MinimumRemainValues(domeniumList, usedVariablesNumbersList, p);
-            Console.WriteLine("MVR: Number of assigments " + counter);
-            Console.WriteLine("Press Key....");
-            Console.ReadKey();
-            
         }
 
         private static int MinimumRemainValues(List<Domenium> domeniumList, List<int> usedVariablesNumbersList, int p)
@@ -125,10 +123,12 @@ namespace RandomExercise
 
         
 
-        private static void MVR(int[] x, int n, int k, int p, List<Domenium> domeniumList, List<Domenium> removedItemFromDomeniumList, int[,] neighbours,List<int> usedVariablesNumbersList)
+        private static void BTWithMVR(int[] x, int n, int k, int p, List<Domenium> domeniumList, List<Domenium> removedItemFromDomeniumList, int[,] neighbours,List<int> usedVariablesNumbersList)
         {
+        
             int min = MinimumRemainValues(domeniumList, usedVariablesNumbersList, p);
             List<int> list = domeniumList.ElementAt(k).ElementsOfDomenium;
+          
             for (int i = 0; i < list.Count; i++)
             {
                 x[k] = list[i];
@@ -137,7 +137,7 @@ namespace RandomExercise
                 {
                     if (IsPromising(x, p, k))
                     {
-                        //RemoveItemFromDomenium(domeniumList, x[k], k, p, removedItemFromDomeniumList, neighbours);
+                        ForwardCheckingRemoveItemFromDomenium(domeniumList, x[k], k, p, removedItemFromDomeniumList, neighbours);
                         usedVariablesNumbersList.Add(min);
                         if (IsSolution(x, k, p))
                         {
@@ -146,8 +146,9 @@ namespace RandomExercise
                         }
                         else
                         {
-                                                      
-                            MVR(x, n, k + 1, p, domeniumList, removedItemFromDomeniumList, neighbours,usedVariablesNumbersList);
+                           
+                            BTWithMVR(x, n, k + 1, p, domeniumList, removedItemFromDomeniumList, neighbours,usedVariablesNumbersList);
+                            BuildDomeniumBack(domeniumList, k, p, removedItemFromDomeniumList);
 
                         }
                     }
@@ -164,28 +165,17 @@ namespace RandomExercise
 
         }
 
-        private static void RemoveItemFromDomenium(List<Domenium> domeniumList, int value, int currentVariable, int p, List<Domenium> removedItemFromDomeniumList,int[,] matrix)
+        private static void ForwardCheckingRemoveItemFromDomenium(List<Domenium> domeniumList, int value, int currentVariable, int p, List<Domenium> removedItemFromDomeniumList,int[,] matrix)
         {
             for(int i=0;i<p;i++)
             {
-                if(matrix[currentVariable,i] ==1 || matrix[i,currentVariable] == 1)
+                if(matrix[currentVariable,i] ==1 && matrix[i,currentVariable] == 1)
                 {
-                    var count = domeniumList[i].ElementsOfDomenium.Where(n => n == value).Count();
                     domeniumList[i].ElementsOfDomenium.RemoveAll(n => n == value);
-                    //domeniumList.Capacity = domeniumList.Capacity - count;
                     removedItemFromDomeniumList[i].ElementsOfDomenium.Add(value);
 
-                    //foreach (var item in removedItemFromDomeniumList[i].ElementsOfDomenium)
-                    //{
-                    //    Console.WriteLine("i" + i + item);
-                    //}
                 }
-             
-            }
-            
-               
-              
-            
+            }  
         }
 
         private static void BT(int[] x, int n, int k, int p)
@@ -221,7 +211,7 @@ namespace RandomExercise
             }
             else
             {
-                //firstSolution = true;
+                firstSolution = true;
                 return true;
             }
         }
