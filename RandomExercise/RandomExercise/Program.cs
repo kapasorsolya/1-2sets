@@ -27,16 +27,10 @@ namespace RandomExercise
             List<int> itemsOfDomenium;
             itemsOfDomenium = Enumerable.Range(1, n).ToList();
 
-            List<int> evenitemsInDomenium;
-            itemsOfDomenium = Enumerable.Range(1, n).ToList();
-
             List<Domenium> removedItemFromDomeniumList = new List<Domenium>();
 
             List<int> evenNumbers = itemsOfDomenium.Where(n1 => n1 % 2 == 0).ToList();
-            foreach(var item in evenNumbers)
-            {
-                Console.WriteLine(item + " ");
-            }
+         
             for (int i = 0; i < p; i++)
             {
                 removedItemFromDomeniumList.Add(new Domenium
@@ -44,7 +38,7 @@ namespace RandomExercise
                     ElementsOfDomenium = new List<int>()
                 });
 
-                if (i == p - 2 || i==p-1)
+                if (i == p - 2)
                 {
                    
                     domeniumList.Add(new Domenium
@@ -67,11 +61,33 @@ namespace RandomExercise
 
             int[,] matrix = new int[p, p];
 
+            List<int> usedVariablesNumbersList = new List<int>();
+
             BuildNeighbours(p,matrix);
-            MVR(a, n, 0, p,domeniumList,removedItemFromDomeniumList,matrix);
+            MVR(a, n, 0, p,domeniumList,removedItemFromDomeniumList,matrix,usedVariablesNumbersList);
+            int value = MinimumRemainValues(domeniumList, usedVariablesNumbersList, p);
             Console.WriteLine("MVR: Number of assigments " + counter);
             Console.WriteLine("Press Key....");
             Console.ReadKey();
+            
+        }
+
+        private static int MinimumRemainValues(List<Domenium> domeniumList, List<int> usedVariablesNumbersList, int p)
+        {
+            int min =Int32.MaxValue;
+            int variable = -1;
+            for(int i=0;i<p; i++)
+            {
+                if(usedVariablesNumbersList.Contains(i) == false)
+                {
+                    if(min > domeniumList[i].ElementsOfDomenium.Count)
+                    {
+                        min = domeniumList[i].ElementsOfDomenium.Count;
+                        variable = i;
+                    }
+                }
+            }
+            return variable;
             
         }
 
@@ -101,14 +117,17 @@ namespace RandomExercise
             //}
 
 
+
+
         }
 
-        private static void MVR(int[] x, int n, int k, int p, List<Domenium> domeniumList, List<Domenium> removedItemFromDomeniumList, int[,] neighbours)
+        
+
+        private static void MVR(int[] x, int n, int k, int p, List<Domenium> domeniumList, List<Domenium> removedItemFromDomeniumList, int[,] neighbours,List<int> usedVariablesNumbersList)
         {
+            int min = MinimumRemainValues(domeniumList, usedVariablesNumbersList, p);
             List<int> list = domeniumList.ElementAt(k).ElementsOfDomenium;
-    
-            
-            for (int  i=0;i<list.Count;i++)
+            for (int i = 0; i < list.Count; i++)
             {
                 x[k] = list[i];
                 counter++;
@@ -116,31 +135,32 @@ namespace RandomExercise
                 {
                     if (IsPromising(x, p, k))
                     {
-                        RemoveItemFromDomenium(domeniumList, x[k], k, p, removedItemFromDomeniumList,neighbours);
-
+                        //RemoveItemFromDomenium(domeniumList, x[k], k, p, removedItemFromDomeniumList, neighbours);
+                        usedVariablesNumbersList.Add(min);
                         if (IsSolution(x, k, p))
                         {
-                            
+
                             Print(x, p);
                         }
                         else
                         {
-                            //BuildDomeniumBack(domeniumList, n, p);
-                            BT(x, n, k + 1, p);
+                                                      
+                            MVR(x, n, k + 1, p, domeniumList, removedItemFromDomeniumList, neighbours,usedVariablesNumbersList);
 
                         }
                     }
-                
-
+                }
             }
         }
-        }
-        
 
-        //private static void BuildDomeniumBack(List<Domenium> domeniumList, int n, int p)
-        //{
-        //   for(int i=0;i<)
-        //}
+        private static void BuildDomeniumBack(List<Domenium> domeniumList, int k, int p, List<Domenium> removedItemFromDomeniumList)
+        {
+            List<int> list = removedItemFromDomeniumList[k].ElementsOfDomenium;
+            domeniumList[k].ElementsOfDomenium.AddRange(list);
+            domeniumList[k].ElementsOfDomenium.OrderBy(n2 =>n2);
+            removedItemFromDomeniumList[k].ElementsOfDomenium.Clear();
+
+        }
 
         private static void RemoveItemFromDomenium(List<Domenium> domeniumList, int value, int currentVariable, int p, List<Domenium> removedItemFromDomeniumList,int[,] matrix)
         {
@@ -152,7 +172,13 @@ namespace RandomExercise
                     domeniumList[i].ElementsOfDomenium.RemoveAll(n => n == value);
                     //domeniumList.Capacity = domeniumList.Capacity - count;
                     removedItemFromDomeniumList[i].ElementsOfDomenium.Add(value);
+
+                    //foreach (var item in removedItemFromDomeniumList[i].ElementsOfDomenium)
+                    //{
+                    //    Console.WriteLine("i" + i + item);
+                    //}
                 }
+             
             }
             
                
