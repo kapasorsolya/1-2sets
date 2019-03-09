@@ -14,44 +14,87 @@ namespace RandomExercise
         static bool firstSolution = false;
         static void Main(string[] args)
         {
-            //if (args.Length == 1)
-            //{
-            //    System.Console.WriteLine("Please enter a numeric argument.");
-            //    System.Console.WriteLine("Usage: Factorial <num>");
-            //    return;
-            //}
 
-            int n = 9;
-            int p = 6;
+            int n, p, type;
+
+
+            if (args.Length != 3)
+            {
+                System.Console.WriteLine("Required 3 numeric argument for solving exercise :)\n ");
+
+                if (args.Length < 1)
+                {
+                    System.Console.WriteLine("Please enter a numeric argument for domenium");
+                }
+                else
+                {
+                    if (args.Length < 2)
+                    {
+                        System.Console.WriteLine("Please enter a numeric argument for length of permutation");
+                    }
+                    else if (args.Length < 3)
+                    {
+                        System.Console.WriteLine("Please enter the type of excercise(1-BT or 2-BT+MVR or 3 BT-AC3");
+                    }
+                }
+                return;
+            }
+
+            n = int.Parse(args[0]);
+            p = int.Parse(args[1]);
+            type = int.Parse(args[2]);
+            System.Console.WriteLine( n+" " + p+" " + type);
+            //n = 10;
+            //p = 6;
+            //type = 3;
+
             int[] a = new int[p];
+            if (type == 1)
+            {
 
-            BT(a, n, 0, p);
+                BT(a, n, 0, p);
+                System.Console.WriteLine("Bactrack: Number of assigments " + counter);
+                counter = 0;
 
-            List<CSP> domeniumList = new List<CSP>();
-            List<CSP> removedItemFromDomeniumList = new List<CSP>();
-            List<int> usedVariablesNumbersList = new List<int>();
+            }
+            else
+            {
+                if (type == 2)
+                {
 
-            Console.WriteLine("Bactrack: Number of assigments " + counter);
+                    List<CSP> domeniumList = new List<CSP>();
+                    List<CSP> removedItemFromDomeniumList = new List<CSP>();
+                    List<int> usedVariablesNumbersList = new List<int>();
 
-            InitializeDomeniums(n,p, domeniumList, removedItemFromDomeniumList);
+                    InitializeDomeniums(n, p, domeniumList, removedItemFromDomeniumList);
+                    BTWithMVR(a, n, 0, p, domeniumList, removedItemFromDomeniumList, usedVariablesNumbersList);
 
-            // print neighboursList
-            //for(int i=0;i<p;i++)
-            //{
-            //    Console.Write(i + "->");
-            //    foreach (var item in domeniumList[i].Neighbours)
-            //    {
-            //        Console.Write(item + " ");
-            //    }
-            //    Console.WriteLine();
-            //}
-            
-            //BTWithMVR(a, n, 0, p,domeniumList,removedItemFromDomeniumList,usedVariablesNumbersList);
-            int value = MinimumRemainValues(domeniumList, usedVariablesNumbersList, p);
-            Console.WriteLine("BT + MVR + forward checking: Number of assigments= " + counter);
-            Console.WriteLine("Press Key....");
-            Console.ReadKey();
-            
+                    System.Console.WriteLine("BT + MVR + forward checking: Number of assigments= " + counter);
+                    counter = 0;
+                }
+                else
+                {
+                    if (type == 3)
+                    {
+                        List<CSP> domeniumList = new List<CSP>();
+                        List<CSP> removedItemFromDomeniumList = new List<CSP>();
+                        List<int> usedVariablesNumbersList = new List<int>();
+
+                        InitializeDomeniums(n, p, domeniumList, removedItemFromDomeniumList);
+
+                        BTWithMVRAndArc(a, n, 0, p, domeniumList, usedVariablesNumbersList);
+
+                        System.Console.WriteLine("BT + MVR + AC3: Number of assigments= " + counter);
+                        counter = 0;
+                    }
+                    else
+                    {
+                        System.Console.WriteLine("Sorry we didn't recognized the type of excercise( it should be 1 or 2 or 3)");
+
+                    }
+
+                }
+            }
         }
 
         private static void InitializeDomeniums(int n, int p, List<CSP> domeniumList, List<CSP> removedItemFromDomeniumList)
@@ -101,6 +144,7 @@ namespace RandomExercise
                 {
                     case 0:
                         neighbours.Add(1);
+                        neighbours.Add(3);
                         domeniumList[i].Neighbours.AddRange(neighbours);
                         neighbours.Clear();
                         break;
@@ -118,6 +162,7 @@ namespace RandomExercise
                         neighbours.Clear();
                         break;
                     case 3:
+                        neighbours.Add(0);
                         neighbours.Add(2);
                         domeniumList[i].Neighbours.AddRange(neighbours);
                         neighbours.Clear();
@@ -181,10 +226,38 @@ namespace RandomExercise
                         }
                         else
                         {
-                           
                             BTWithMVR(x, n, k + 1, p, domeniumList, removedItemFromDomeniumList,usedVariablesNumbersList);
                             BuildDomeniumBack(domeniumList, k, p, removedItemFromDomeniumList);
 
+                        }
+                    }
+                }
+            }
+        }
+
+        private static void BTWithMVRAndArc(int[] x, int n, int k, int p, List<CSP> domeniumList, List<int> usedVariablesNumbersList)
+        {
+
+            int min = MinimumRemainValues(domeniumList, usedVariablesNumbersList, p);
+            List<int> list = domeniumList.ElementAt(k).ElementsOfDomenium;
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                x[k] = list[i];
+                counter++;
+                if (firstSolution == false)
+                {
+                    if (IsPromising(x, p, k))
+                    {
+                        usedVariablesNumbersList.Add(min);
+                        if (IsSolution(x, k, p))
+                        {
+                            Print(x, p);
+                        }
+                        else
+                        {
+                            Ac3(domeniumList, p);
+                            BTWithMVRAndArc(x, n, k + 1, p, domeniumList, usedVariablesNumbersList);
                         }
                     }
                 }
@@ -226,7 +299,6 @@ namespace RandomExercise
                        if (IsSolution(x, k, p))
                         {
                             Print(x, p);
-
                         }
                         else
                         {
@@ -236,8 +308,6 @@ namespace RandomExercise
                 }
             }
         }
-
-
 
         private static bool IsSolution(int[] x, int k, int p)
         {
@@ -282,43 +352,64 @@ namespace RandomExercise
             }
             return true;
         }
-        public static void Ac3(List<CSP> domeniumList,int[,]matrix)
-        {
-            Queue queue=new Queue();
 
-            while (queue.Count!=null)
+        public static void Ac3(List<CSP> domeniumList,int p)
+        {
+            Queue<Arc> queue=new Queue<Arc>();
+
+            //add items to the queue
+            for(int i=0;i<p;i++)
             {
-                //if (RemoveInconsistentValues(x0, x1, domeniumList))
-                //{
-                //    for (int i = 0; i < matrix.GetLength(0); i++)
-                //    {
-                //        queue = (matrix[x0, i], x0);
-                //    }
-                //}
+                foreach(var item in domeniumList[i].Neighbours)
+                {
+                    queue.Enqueue(new Arc {
+                        FirstArc = i,
+                        SecondArc = item
+                    
+                    });
+                }
+            }
+
+            int xi, xj;
+            while (queue.Count > 0)
+            {
+                var item = queue.Dequeue();
+                xi = item.FirstArc;
+                xj = item.SecondArc;
+
+                if (RemoveInconsistentValues(xi, xj, domeniumList) ==true)
+                {
+                    if(domeniumList[xi].ElementsOfDomenium.Count ==0 || domeniumList[xj].ElementsOfDomenium.Count ==0)
+                    {
+                        break;
+                    }
+                    foreach(var element in domeniumList[xi].Neighbours)
+                    {
+                        queue.Enqueue(new Arc
+                        {
+                            FirstArc = xi,
+                            SecondArc = element
+                        });
+                    }
+                }
             }
             
         }
-        public static bool RemoveInconsistentValues(int x0, int x1, List<CSP> domeniumList){
+        public static bool RemoveInconsistentValues(int xi, int xj, List<CSP> domeniumList){
             bool removed=false;
-            bool yes;
-            foreach(var i in domeniumList.ElementAt(x0).ElementsOfDomenium){
-                yes=false;
-                foreach(var j in domeniumList.ElementAt(x1).ElementsOfDomenium){
-                    if(i!=j){
-                    yes=true;
-                    break;
-                        }
-
-                }
-                 if(!yes)
+            
+            for(int i=0;i<domeniumList[xi].ElementsOfDomenium.Count;i++)
+            {
+                if(domeniumList[xj].ElementsOfDomenium.Contains(domeniumList[xi].ElementsOfDomenium[i])==true)
                 {
-                 domeniumList.ElementAt(x0).ElementsOfDomenium.Remove(i);
-                    removed=true;
+                    domeniumList[xi].ElementsOfDomenium.RemoveAll(n1 => n1 == domeniumList[xi].ElementsOfDomenium[i]);
+                    removed = true;
                     
-                }
 
-            }                   
+                }
+            }
             return removed;
+
         }
 
     }

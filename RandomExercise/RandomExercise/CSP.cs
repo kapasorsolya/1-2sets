@@ -9,7 +9,7 @@ namespace RandomExercise
 {
     public class CSP
     {
-       // public int Level { get; set; }
+       
         public List<int> ElementsOfDomenium { get; set; }
 
         public List<int> Neighbours { get; set; }

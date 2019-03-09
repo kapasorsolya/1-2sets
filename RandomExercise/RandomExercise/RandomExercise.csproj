@@ -43,6 +43,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="C:\Users\Orsolya\Desktop\Arc.cs">
+      <Link>Arc.cs</Link>
+    </Compile>
     <Compile Include="CSP.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
