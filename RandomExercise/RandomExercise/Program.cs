@@ -396,22 +396,46 @@ namespace RandomExercise
             
         }
         public static bool RemoveInconsistentValues(int xi, int xj, List<CSP> domeniumList){
-            bool removed=false;
-            
-            for(int i=0;i<domeniumList[xi].ElementsOfDomenium.Count;i++)
+            //bool removed=false;
+            bool removed = false;
+            bool yes;
+            foreach (var i in domeniumList.ElementAt(xi).ElementsOfDomenium)
             {
-                if(domeniumList[xj].ElementsOfDomenium.Contains(domeniumList[xi].ElementsOfDomenium[i])==true)
+                yes = false;
+                foreach (var j in domeniumList.ElementAt(xj).ElementsOfDomenium)
                 {
-                    domeniumList[xi].ElementsOfDomenium.RemoveAll(n1 => n1 == domeniumList[xi].ElementsOfDomenium[i]);
-                    removed = true;
-                    
+                    if (i != j)
+                    {
+                        yes = true;
+                        break;
+                    }
 
                 }
+                if (!yes)
+                {
+                    domeniumList.ElementAt(xi).ElementsOfDomenium.Remove(i);
+                    removed = true;
+
+                }
+
             }
             return removed;
-
         }
+        /*
+        for(int i=0;i<domeniumList[xi].ElementsOfDomenium.Count;i++)
+        {
+            if(domeniumList[xj].ElementsOfDomenium.Contains(domeniumList[xi].ElementsOfDomenium[i])==true)
+            {
+                domeniumList[xi].ElementsOfDomenium.RemoveAll(n1 => n1 == domeniumList[xi].ElementsOfDomenium[i]);
+                removed = true;
+
+
+            }
+        }
+        return removed;
+        */
+    }
 
     }
 
-}
+//}
